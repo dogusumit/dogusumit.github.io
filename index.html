@@ -35,23 +35,23 @@ $( "#startdate" ).datepicker({ dateFormat: 'dd-mm-yy' });
 $( "#enddate" ).datepicker({ dateFormat: 'dd-mm-yy' });
 
 $('#enddate').change(function() {
-var start = $('#startdate').datepicker('getDate');
-var end   = $('#enddate').datepicker('getDate');
-
-if (start<end) {
-var days   = (end - start)/1000/60/60/24;
+var a = $('#startdate').datepicker('getDate');
+var b = $('#enddate').datepicker('getDate');
+const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+var days   = Math.floor((utc2 - utc1) / _MS_PER_DAY);
 $('#days').val(days);
-}
 }); //end change function
 
 $("#startdate").change(function() {
-var start = $('#startdate').datepicker('getDate');
-var end   = $('#enddate').datepicker('getDate');
-
-if (start<end) {
-var days   = (end - start)/1000/60/60/24;
+var a = $('#startdate').datepicker('getDate');
+var b = $('#enddate').datepicker('getDate');
+const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+var days   = Math.floor((utc2 - utc1) / _MS_PER_DAY);
 $('#days').val(days);
-}
 }); //end change function
 
 }); //end ready
