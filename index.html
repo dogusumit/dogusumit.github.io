@@ -1,58 +1,124 @@
 <!doctype html>
-
 <html>
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarih Hesapla</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 
-<meta charset="utf-8">
+	<style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
 
-<title>Tarih Hesapla</title>
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 350px;
+        }
 
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+        .container h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
 
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        .container label {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 5px;
+        }
 
-<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+        .container input,
+        .container select {
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 18px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
 
-<p>Baslangic Tarihi : <input type="text" id="startdate"></p>
-<p>Bitis Tarihi : <input type="text" id="enddate"></p>
-<p>Gun Sayisi : <input type="text" id="days"></p>
+        .container button {
+            padding: 12px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+        }
 
+        .container button:hover {
+            background-color: #45a049;
+        }
 
-<script>
-$(document).ready(function() {
+        .result {
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: bold;
+        }
 
-$( "#startdate,#enddate" ).datepicker({
-changeMonth: true,
-changeYear: true,
-firstDay: 1,
-monthNamesShort: [ "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık" ],
-dayNamesMin: [ "Pa", "Pt", "Sa", "Ça", "Pe", "Cu", "Ct" ],
-dateFormat: "dd.mm.yy"
-})
+        /* Ortalamak için kullanılan CSS */
+        .container {
+            text-align: center;
+        }
 
-$( "#startdate" ).datepicker({ dateFormat: 'dd-mm-yy' });
-$( "#enddate" ).datepicker({ dateFormat: 'dd-mm-yy' });
+        .result {
+            text-align: center;
+        }
+	</style>
+</head>
 
-$('#enddate').change(function() {
-var a = $('#startdate').datepicker('getDate');
-var b = $('#enddate').datepicker('getDate');
-const _MS_PER_DAY = 1000 * 60 * 60 * 24;
-const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
-const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
-var days   = Math.floor((utc2 - utc1) / _MS_PER_DAY);
-$('#days').val(days);
-}); //end change function
+<body>
+        <div class="container">
+        <h1>İki Tarih Arası Gün Hesapla</h1>
+        <p>Basl. Tarihi : <input type="text" id="startdate" autocomplete="off"></p>
+        <p>Bitis Tarihi : <input type="text" id="enddate" autocomplete="off"></p>
+        <p>Gun Sayisi : <input type="text" id="days" disabled autocomplete="off"></p>
+        <button id="button">Hesapla</button>
+    </div>
 
-$("#startdate").change(function() {
-var a = $('#startdate').datepicker('getDate');
-var b = $('#enddate').datepicker('getDate');
-const _MS_PER_DAY = 1000 * 60 * 60 * 24;
-const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
-const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
-var days   = Math.floor((utc2 - utc1) / _MS_PER_DAY);
-$('#days').val(days);
-}); //end change function
+    <script>
+        $(document).ready(function () {
+            $("#startdate,#enddate").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                firstDay: 1,
+                monthNamesShort: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"],
+                dayNamesMin: ["Pa", "Pt", "Sa", "Ça", "Pe", "Cu", "Ct"],
+                dateFormat: "dd.mm.yy"
+            })
+        }); //end ready
 
-}); //end ready
-</script>
+        $("#startdate,#enddate").on("change", function () {
+            $('#days').val(' ');
+        }); //end change function
+
+        $('#button').on("click", function () {
+            try {
+                var a = $.datepicker.parseDate('dd.mm.yy', $('#startdate').val());
+                var b = $.datepicker.parseDate('dd.mm.yy', $('#enddate').val());
+                const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+                const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+                const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+                var days = Math.floor((utc2 - utc1) / _MS_PER_DAY);
+                $('#days').val(days);
+            } catch (error) {
+                alert('Tarihi "Gün.Ay.Yıl" formatında giriniz!');
+            }
+        }); //end click function
+    </script>
+</body>
