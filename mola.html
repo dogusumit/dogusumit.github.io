@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mola Hesapla</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 350px;
+        }
+
+        .container h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .container label {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .container input,
+        .container select {
+            padding: 12px;
+            margin: 10px 0;
+            width: 100%;
+            font-size: 18px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .container button {
+            padding: 12px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .container button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        /* Ortalamak için kullanılan CSS */
+        .container {
+            text-align: center;
+        }
+
+        .result {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <label for="start-time">Molaya kaçta çıktın?</label>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <input type="time" id="start-time" />
+        </div>
+
+        <br><br>
+        <label for="add-time">Molan ne kadar?</label>
+        <select id="add-time">
+            <option value="15">15 dakika</option>
+            <option value="30">30 dakika</option>
+            <option value="45">45 dakika</option>
+            <option value="60">1 saat</option>
+            <option value="75">1 saat 15 dakika</option>
+            <option value="90">1 saat 30 dakika</option>
+            <option value="105">1 saat 45 dakika</option>
+            <option value="120">2 saat</option>
+        </select>
+
+        <button onclick="calculateTime()">Hesapla</button>
+
+        <br><br>
+        <div class="result" id="result"></div>
+        <p id="result2"></p>
+    </div>
+
+    <script>
+        // Başlangıç saati için GMT+3 ayarı
+        function getCurrentTime() {
+            const currentDate = new Date();
+            // GMT+3 saat dilimine göre saat ayarlama
+            const offset = 3 * 60; // GMT+3 => 3 saatlik offset
+            currentDate.setMinutes(currentDate.getMinutes() + currentDate.getTimezoneOffset() + offset);
+
+            // Varsayılan saat formatı
+            const hours = currentDate.getHours().toString().padStart(2, '0');
+            const minutes = currentDate.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+
+        // Sayfa yüklendiğinde başlangıç saatini göster
+        // Eğer daha önce hesaplanan bir sonuç varsa, onu geri getir
+        const savedData = localStorage.getItem('savedData');
+        if (savedData) {
+            const { startTime, addTime, resultTime } = JSON.parse(savedData);
+
+            // Verileri alanlara yerleştir
+            document.getElementById('start-time').value = startTime;
+            document.getElementById('add-time').value = addTime;
+            document.getElementById('result').textContent = resultTime;
+        }
+        else {
+            document.getElementById('start-time').value = getCurrentTime();
+        }
+
+        // Şimdi butonuna tıklanınca GMT+3'teki şu anki zamanı al ve başlama saati olarak yerleştir
+        function setCurrentTime() {
+            document.getElementById('start-time').value = getCurrentTime();
+            document.getElementById('result').textContent = '';
+            document.getElementById('result2').textContent = '';
+        }
+
+        // Eklenecek süre değiştiğinde hesaplamayı temizle
+        document.getElementById('add-time').addEventListener('change', function () {
+            document.getElementById('result').textContent = ''; // Hesaplama sonucunu temizle
+            document.getElementById('result2').textContent = '';
+        });
+
+        document.getElementById('start-time').addEventListener('change', function () {
+            document.getElementById('result').textContent = ''; // Hesaplama sonucunu temizle
+            document.getElementById('result2').textContent = '';
+        });
+
+        // Hesapla butonuna tıklandığında çalışacak fonksiyon
+        function calculateTime() {
+            const startTimeValue = document.getElementById('start-time').value;
+            const selectedTime = parseInt(document.getElementById('add-time').value);
+
+            if (!startTimeValue) {
+                alert('Lütfen başlangıç saati seçin!');
+                return;
+            }
+
+            const [startHour, startMinute] = startTimeValue.split(':').map(Number);
+
+            // Başlangıç saatine ekleme yap
+            let totalMinutes = startHour * 60 + startMinute + selectedTime;
+
+            // Yeni saat ve dakika hesaplama
+            const newHour = Math.floor(totalMinutes / 60) % 24;
+            const newMinute = totalMinutes % 60;
+
+            // Sonucu göster
+            const resultText = `Bitiş saati: ${newHour.toString().padStart(2, '0')}:${newMinute.toString().padStart(2, '0')}`;
+            document.getElementById('result').textContent = resultText;
+			document.getElementById('result2').textContent = 'İyi molalar juju, az sigara iç :D';
+
+            // Hesaplanan veriyi localStorage'a kaydet
+            const savedData = {
+                startTime: startTimeValue,
+                addTime: selectedTime,
+                resultTime: resultText,
+            };
+
+            localStorage.setItem('savedData', JSON.stringify(savedData));
+        }
+    </script>
+
+</body>
+
+</html>
